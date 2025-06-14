@@ -17,21 +17,39 @@ function evaluatePurchase() {
         return;
     }
     const impact = (cost / balance) * 100;
-    document.getElementById('impactResult').innerText = 
+    document.getElementById('impactResult').innerText =
         `This purchase will reduce your balance by ${impact.toFixed(2)}%. Remaining after purchase: MVR ${(balance - cost).toFixed(2)}`;
     document.getElementById('checklistSection').style.display = 'block';
 }
 
 function finalDecision() {
-    const checks = document.querySelectorAll('#checklistForm input[type="checkbox"]');
-    let allChecked = true;
-    checks.forEach(cb => {
-        if (!cb.checked) allChecked = false;
-    });
-    const decision = document.getElementById('finalDecisionOutput');
-    if (allChecked) {
-        decision.innerHTML = "<strong>✅ Purchase Approved. Proceed mindfully.</strong>";
+    const answers = {
+        q1: document.getElementById('q1').value,
+        q2: document.getElementById('q2').value,
+        q3: document.getElementById('q3').value,
+        q4: document.getElementById('q4').value,
+        q5: document.getElementById('q5').value,
+        q6: document.getElementById('q6').value
+    };
+
+    let score = 0;
+    if (answers.q1 === 'need') score++;
+    if (answers.q2 === 'yes') score++;
+    if (answers.q3 === 'no') score++;
+    if (answers.q4 === 'no') score++;
+    if (answers.q5 === 'yes') score++;
+    if (answers.q6 === 'no') score++;
+
+    let decisionMsg = '';
+    if (Object.values(answers).includes("")) {
+        decisionMsg = "⚠️ Please answer all checklist questions.";
+    } else if (score >= 5) {
+        decisionMsg = "✅ Purchase Approved. This seems to be a well-justified spending.";
+    } else if (score >= 3) {
+        decisionMsg = "🟡 Consider Delaying. Some caution signals detected.";
     } else {
-        decision.innerHTML = "<strong>⚠️ Some checklist items are unchecked. Please review before finalizing.</strong>";
+        decisionMsg = "❌ Not Recommended. Too many red flags in this decision.";
     }
+
+    document.getElementById('finalDecisionOutput').innerHTML = `<strong>${decisionMsg}</strong>`;
 }
